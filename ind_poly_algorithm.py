@@ -12,7 +12,7 @@ def independence_poly(tree, coeffs=False, yield_tree=False):
         return res, tree 
     return res
 
-def recursively_generate_poly(tree):
+def recursively_generate_poly(tree, memo={}):
     # base cases
     if len(tree) < 1:
         return 1
@@ -20,6 +20,11 @@ def recursively_generate_poly(tree):
         return sympy.Poly(1 + x)
     if len(tree) == 2:
         return sympy.Poly(1 + 2*x)
+    
+    # check memo
+    key = frozenset(tree.edges)
+    if key in memo:
+        return memo[key]
 
     reconstruct_dict = {}
     max_node = max(tree.nodes)
@@ -39,8 +44,10 @@ def recursively_generate_poly(tree):
     else:
         poly_nbrs_removed = sympy.Poly(reduce(lambda a, b: a*b, 
                                             [recursively_generate_poly(subgraph) for subgraph in components_neigbors_removed]))
+    
     tree = reconstruct_graph(tree, reconstruct_dict)
     final_poly = poly_max_removed + (x * poly_nbrs_removed)
+    memo[key] = final_poly
     return final_poly
 
 def reconstruct_graph(graph, reconstruct_dict):
@@ -51,9 +58,8 @@ def reconstruct_graph(graph, reconstruct_dict):
 
 
 if __name__ == '__main__':
-    star = nx.Graph()
-    star.add_edges_from([(5, 1), (5, 2), (5, 3)])
-    res = independence_poly(star)
+    tree = nx.path_graph(26)
+    res = independence_poly(tree, coeffs=True)
     print(res)
 
     

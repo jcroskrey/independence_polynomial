@@ -35,7 +35,7 @@ def recursively_generate_poly(tree, memo={}):
     tree.remove_node(max_node)
     components_max_removed = [tree.subgraph(c).copy() for c in nx.connected_components(tree)]
     poly_max_removed = sympy.Poly(reduce(lambda a, b: a*b, 
-                                        [recursively_generate_poly(subgraph) for subgraph in components_max_removed]))
+                                        [recursively_generate_poly(subgraph, memo=memo) for subgraph in components_max_removed]))
     for node in list(nbrs_of_max_nodes):
         tree.remove_node(node)
     components_neigbors_removed = [tree.subgraph(c).copy() for c in nx.connected_components(tree)]
@@ -43,7 +43,7 @@ def recursively_generate_poly(tree, memo={}):
         poly_nbrs_removed = 1
     else:
         poly_nbrs_removed = sympy.Poly(reduce(lambda a, b: a*b, 
-                                            [recursively_generate_poly(subgraph) for subgraph in components_neigbors_removed]))
+                                            [recursively_generate_poly(subgraph, memo=memo) for subgraph in components_neigbors_removed]))
     
     tree = reconstruct_graph(tree, reconstruct_dict)
     final_poly = poly_max_removed + (x * poly_nbrs_removed)
@@ -58,7 +58,7 @@ def reconstruct_graph(graph, reconstruct_dict):
 
 
 if __name__ == '__main__':
-    tree = nx.path_graph(26)
+    tree = nx.path_graph(30)
     res = independence_poly(tree, coeffs=True)
     print(res)
 

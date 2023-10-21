@@ -3,7 +3,7 @@ import sympy
 from functools import reduce
 
 x = sympy.symbols('x')
-nx.Graph().add_edge
+
 def independence_poly(tree, coeffs=False, yield_tree=False):
     res = recursively_generate_poly(tree)
     if coeffs and res != 1:

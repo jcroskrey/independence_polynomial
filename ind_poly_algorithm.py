@@ -5,6 +5,10 @@ from functools import reduce
 x = sympy.symbols('x')
 
 def independence_poly(tree, coeffs=False, yield_tree=False):
+    """
+    Calls recursively_generate_poly and returns either a networkx graph object
+    or a list of coefficients.
+    """
     res = recursively_generate_poly(tree)
     if coeffs and res != 1:
         res = res.coeffs()
@@ -13,6 +17,9 @@ def independence_poly(tree, coeffs=False, yield_tree=False):
     return res
 
 def recursively_generate_poly(tree, memo={}):
+    """
+    Recursively generates polynomial starting from base cases.
+    """
     # base cases
     if len(tree) < 1:
         return 1
@@ -22,7 +29,7 @@ def recursively_generate_poly(tree, memo={}):
         return sympy.Poly(1 + 2*x)
     
     # check memo
-    key = frozenset(tree.edges)
+    key = frozenset(tree.edges) # frozenset since sets are mutable and can't be hashed
     if key in memo:
         return memo[key]
 
@@ -51,9 +58,14 @@ def recursively_generate_poly(tree, memo={}):
     return final_poly
 
 def reconstruct_graph(graph, reconstruct_dict):
+    """
+    Reconstruct the graph from the edges, always placing the minimum of the two
+    nodes on the left and the maximum of the nodes on the right. This way the 
+    frozensets of the edge list will be consistent the memoization dictionary.
+    """
     for node, nbr_list in reconstruct_dict.items():
         for nbr in nbr_list:
-            graph.add_edge(max(node, nbr), min(node, nbr))
+            graph.add_edge(min(node, nbr), max(node, nbr))
     return graph
 
 
